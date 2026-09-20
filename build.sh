@@ -18,13 +18,13 @@ fi
 # Install dependencies
 echo
 echo "=== Installing Python dependencies ==="
-pip3 install --upgrade pip setuptools wheel
-pip3 install -r requirements.txt
+python3 -m pip install --upgrade pip setuptools wheel
+python3 -m pip install -r requirements.txt
 
 # Install py2app
 echo
 echo "=== Installing py2app ==="
-pip3 install py2app
+python3 -m pip install py2app
 
 # Create icon if not exists
 if [ ! -f assets/app_icon.icns ]; then
