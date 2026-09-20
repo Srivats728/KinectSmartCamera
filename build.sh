@@ -6,8 +6,27 @@ set -e
 echo "=== Kinect Smart Camera Build Script ==="
 echo
 
-# Check Python version
-python_version=$(python3 --version 2>&1 | cut -d' ' -f2)
+# Find a compatible Python version (3.11 or 3.12 preferred for mediapipe wheels)
+PYTHON_CMD=""
+for py in python3.11 python3.12 python3.13 python3; do
+    if command -v "$py" &> /dev/null; then
+        version=$($py --version 2>&1 | cut -d' ' -f2)
+        major_minor=$(echo $version | cut -d. -f1,2)
+        if [[ "$major_minor" == "3.11" ]] || [[ "$major_minor" == "3.12" ]] || [[ "$major_minor" == "3.13" ]]; then
+            PYTHON_CMD="$py"
+            echo "Using Python $version at $(command -v $py)"
+            break
+        fi
+    fi
+done
+
+if [ -z "$PYTHON_CMD" ]; then
+    echo "ERROR: No compatible Python found (need 3.11, 3.12, or 3.13)."
+    echo "Install with: brew install python@3.11"
+    exit 1
+fi
+
+python_version=$($PYTHON_CMD --version 2>&1 | cut -d' ' -f2)
 echo "Python version: $python_version"
 
 # Check if on macOS
@@ -18,25 +37,25 @@ fi
 # Install dependencies
 echo
 echo "=== Installing Python dependencies ==="
-python3 -m pip install --upgrade pip setuptools wheel
-python3 -m pip install -r requirements.txt
+$PYTHON_CMD -m pip install --upgrade pip setuptools wheel
+$PYTHON_CMD -m pip install -r requirements.txt
 
 # Install py2app
 echo
 echo "=== Installing py2app ==="
-python3 -m pip install py2app
+$PYTHON_CMD -m pip install py2app
 
 # Create icon if not exists
 if [ ! -f assets/app_icon.icns ]; then
     echo
     echo "=== Creating app icon ==="
-    python3 scripts/create_icon.py
+    $PYTHON_CMD scripts/create_icon.py
 fi
 
 # Build the app
 echo
 echo "=== Building .app bundle ==="
-python3 setup.py py2app
+$PYTHON_CMD setup.py py2app
 
 # Check result
 app_path="dist/Kinect Smart Camera.app"
