@@ -1,0 +1,11 @@
+freenect2==0.2.3
+opencv-python==4.10.0.84
+mediapipe==0.10.14
+numpy==1.26.4
+sounddevice==0.4.7
+scipy==1.13.0
+paho-mqtt==2.0.0
+pyyaml==6.0.1
+py2app==0.28.8
+rumps==0.4.0
+Pillow==10.4.0

@@ -1,0 +1,100 @@
+# Kinect Smart Camera Configuration
+# Copy this to config.yaml and modify as needed
+
+kinect:
+  device_index: 0
+  enable_color: true
+  enable_depth: true
+  enable_ir: true
+  color_resolution: "1080p"  # 1080p, 720p
+  depth_resolution: "512x424"
+  frame_rate: 30
+
+detection:
+  human_detection:
+    enabled: true
+    confidence_threshold: 0.5
+    min_person_height: 0.5  # meters
+    max_distance: 5.0  # meters
+    use_depth: true
+    use_mediapipe: true
+  
+  clap_detection:
+    enabled: true
+    sample_rate: 44100
+    chunk_size: 1024
+    rms_threshold: 0.02
+    peak_threshold: 0.15
+    cooldown_ms: 500
+    min_clap_interval_ms: 200
+    max_clap_interval_ms: 1000
+
+training:
+  gesture_training:
+    enabled: true
+    sample_duration_sec: 3
+    min_samples_per_gesture: 10
+    feature_type: "pose_landmarks"  # pose_landmarks, hand_landmarks, depth_flow
+    model_path: "models/gesture_classifier.pkl"
+    scaler_path: "models/scaler.pkl"
+  
+  action_training:
+    enabled: true
+    sequence_length: 30  # frames
+    overlap: 0.5
+
+home_assistant:
+  enabled: true
+  connection_type: "mqtt"  # mqtt, rest
+  mqtt:
+    host: "localhost"
+    port: 1883
+    username: ""
+    password: ""
+    client_id: "kinect_smart_camera"
+    base_topic: "kinect/smart_camera"
+    discovery_prefix: "homeassistant"
+    birth_message: true
+    will_message: true
+  rest:
+    url: "http://localhost:8123"
+    token: ""
+    verify_ssl: true
+  
+  entities:
+    human_presence:
+      enabled: true
+      topic_suffix: "human_presence"
+      device_class: "presence"
+    human_count:
+      enabled: true
+      topic_suffix: "human_count"
+      device_class: "counter"
+    clap_detected:
+      enabled: true
+      topic_suffix: "clap_detected"
+      device_class: "timestamp"
+    gesture_detected:
+      enabled: true
+      topic_suffix: "gesture_detected"
+      device_class: "enum"
+    custom_action_detected:
+      enabled: true
+      topic_suffix: "custom_action_detected"
+      device_class: "enum"
+
+app:
+  name: "Kinect Smart Camera"
+  version: "1.0.0"
+  menu_bar: true
+  auto_start: false
+  log_level: "INFO"
+  show_preview: true
+  preview_width: 640
+  preview_height: 480
+
+advanced:
+  usb_power_management: true
+  depth_registration: true
+  bilateral_filter: true
+  edge_aware_filter: true
