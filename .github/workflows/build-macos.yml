@@ -30,11 +30,14 @@ jobs:
         run: |
           git clone https://github.com/OpenKinect/libfreenect2.git /tmp/libfreenect2
           cd /tmp/libfreenect2
+          # Fix CMake minimum version for modern CMake
+          sed -i 's/cmake_minimum_required(VERSION 2.8)/cmake_minimum_required(VERSION 3.5)/' CMakeLists.txt
           mkdir build && cd build
           cmake .. \
             -DCMAKE_INSTALL_PREFIX=/usr/local \
             -DCMAKE_OSX_ARCHITECTURES=x86_64 \
-            -DENABLE_CXX11=ON
+            -DENABLE_CXX11=ON \
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5
           make -j$(sysctl -n hw.ncpu)
           sudo make install
 
@@ -75,54 +78,4 @@ jobs:
         with:
           name: Kinect-Smart-Camera-DMG
           path: KinectSmartCamera.dmg
-          retention-days: 30
-
-  # Optional: Test on Apple Silicon too
-  build-arm64:
-    name: Build .app on macOS Apple Silicon
-    runs-on: macos-14  # Apple Silicon runner
-    timeout-minutes: 60
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install system dependencies
-        run: |
-          brew update
-          brew install libusb pkg-config cmake portaudio
-
-      - name: Build libfreenect2 (ARM64)
-        run: |
-          git clone https://github.com/OpenKinect/libfreenect2.git /tmp/libfreenect2
-          cd /tmp/libfreenect2
-          mkdir build && cd build
-          cmake .. \
-            -DCMAKE_INSTALL_PREFIX=/usr/local \
-            -DCMAKE_OSX_ARCHITECTURES=arm64 \
-            -DENABLE_CXX11=ON
-          make -j$(sysctl -n hw.ncpu)
-          sudo make install
-
-      - name: Install Python dependencies
-        run: |
-          pip install --upgrade pip setuptools wheel
-          pip install -r requirements.txt
-          pip install py2app
-
-      - name: Build app with py2app
-        run: |
-          python setup.py py2app
-
-      - name: Upload .app artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Kinect-Smart-Camera-macOS-ARM64
-          path: dist/"Kinect Smart Camera.app"
           retention-days: 30
