@@ -37,13 +37,13 @@ fi
 # Install dependencies
 echo
 echo "=== Installing Python dependencies ==="
-$PYTHON_CMD -m pip install --upgrade pip setuptools wheel
-$PYTHON_CMD -m pip install -r requirements.txt
+$PYTHON_CMD -m pip install --upgrade pip setuptools wheel --break-system-packages
+$PYTHON_CMD -m pip install -r requirements.txt --break-system-packages
 
 # Install py2app
 echo
 echo "=== Installing py2app ==="
-$PYTHON_CMD -m pip install py2app
+$PYTHON_CMD -m pip install py2app --break-system-packages
 
 # Create icon if not exists
 if [ ! -f assets/app_icon.icns ]; then
